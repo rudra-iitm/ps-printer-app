@@ -709,6 +709,9 @@ parts:
 
   utils:
     plugin: nil
+    overlay-packages:
+      - python3
+      - dbus
     override-prime: |
       set -eux
       craftctl default
