@@ -31,7 +31,7 @@ services:
     before: [avahi, ps-printer-app]
 
   avahi:
-    command: usr/sbin/avahi-daemon -f /etc/avahi/avahi-daemon.conf --no-drop-root
+    command: /usr/sbin/avahi-daemon -f /etc/avahi/avahi-daemon.conf --no-drop-root
     override: replace
     on-failure: restart
     startup: enabled
@@ -712,6 +712,7 @@ parts:
     overlay-packages:
       - python3
       - dbus
+      - libnss-mdns
     override-prime: |
       set -eux
       craftctl default
@@ -815,10 +816,8 @@ parts:
     stage-packages:
       - libdaemon0
       - libevent-2.1-7
-      - libnss-mdns
       - avahi-utils
       - mdns-scan
-      - dbus
       # - libavahi-client3
       # - libavahi-common3
     stage:
@@ -832,7 +831,7 @@ parts:
       - -usr/lib/**/libavahi-glib*
       - -usr/lib/**/libavahi-libevent*
       - -usr/lib/**/libevent-*
-      - -usr/lib/**/libnss_mdns*
+      # - -usr/lib/**/libnss_mdns*
       - -usr/lib/**/pkgconfig
       - -usr/include
       - -usr/share/doc
