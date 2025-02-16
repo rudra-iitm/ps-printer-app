@@ -801,6 +801,7 @@ parts:
     override-prime: |
       set -eux
       craftctl default
+      sed -i 's/use-ipv6=yes/use-ipv6=no/' ${CRAFT_PRIME}/etc/avahi/avahi-daemon.conf
       sed -i 's|<user>messagebus</user>|<user>_daemon_</user>|; /<policy user="root">/,/<\/policy>/d' $CRAFT_PRIME/usr/share/dbus-1/system.conf
       sed -i 's/<policy group="netdev">/<policy group="_daemon_">/g; s/<policy user="root">/<policy user="_daemon_">/g' $CRAFT_PRIME/usr/share/dbus-1/system.d/avahi-dbus.conf
     stage-packages:
