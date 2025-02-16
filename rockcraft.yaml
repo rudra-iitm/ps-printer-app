@@ -23,27 +23,18 @@ adopt-info: foomatic-db
 run-user: _daemon_
 
 services:
-  dbus-daemon:
-    command: /usr/bin/dbus-daemon --system --nofork
+  avahi-daemon:
+    command: /scripts/run-avahi.sh
     override: replace
     on-failure: restart
     startup: enabled
-    before: [avahi, ps-printer-app]
-
-  avahi:
-    command: /usr/sbin/avahi-daemon -f /etc/avahi/avahi-daemon.conf --no-drop-root
-    override: replace
-    on-failure: restart
-    startup: enabled
-    after: [dbus-daemon]
-    before: [ps-printer-app]
 
   ps-printer-app:
     command: /scripts/start-server.sh
     override: replace
     on-failure: shutdown
     startup: enabled
-    after: [dbus-daemon, avahi]
+    after: [avahi-daemon]
 
 parts:
   pappl:
@@ -721,10 +712,9 @@ parts:
       chown 584792:584792 "$CRAFT_PRIME/var/run/avahi-daemon"
       chmod 777 "$CRAFT_PRIME/var/run/avahi-daemon"
 
-      # # Ensure the dbus run directory exists with proper permissions
-      mkdir -p "$CRAFT_PRIME/run/dbus"
-      chown 584792:584792 "$CRAFT_PRIME/run/dbus"
-      chmod 770 "$CRAFT_PRIME/run/dbus"
+      mkdir -p "$CRAFT_PRIME/var/run/dbus"
+      chown 584792:584792 "$CRAFT_PRIME/var/run/dbus"
+      chmod 777 "$CRAFT_PRIME/var/run/dbus"
 
       # Set up the CUPS SSL server root directory
       CUPS_SERVERROOT="$CRAFT_PRIME/etc/cups/ssl"
@@ -844,6 +834,7 @@ parts:
     source: scripts/
     organize:
       start-server.sh: /scripts/start-server.sh
+      run-avahi.sh: /scripts/run-avahi.sh
     override-prime: |
       set -eux
       craftctl default
