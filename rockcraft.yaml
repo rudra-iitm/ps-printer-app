@@ -698,51 +698,6 @@ parts:
       - -usr/share/man
     after: [avahi, pappl-retrofit, pappl, libcupsfilters, libppd, cups-filters, foomatic-db, hplip]
 
-  utils:
-    plugin: nil
-    overlay-packages:
-      - python3
-      - dbus
-      - libnss-mdns
-    override-prime: |
-      set -eux
-      craftctl default
-
-      mkdir -p "$CRAFT_PRIME/var/run/avahi-daemon"
-      chown 584792:584792 "$CRAFT_PRIME/var/run/avahi-daemon"
-      chmod 777 "$CRAFT_PRIME/var/run/avahi-daemon"
-
-      mkdir -p "$CRAFT_PRIME/var/run/dbus"
-      chown 584792:584792 "$CRAFT_PRIME/var/run/dbus"
-      chmod 777 "$CRAFT_PRIME/var/run/dbus"
-
-      # Set up the CUPS SSL server root directory
-      CUPS_SERVERROOT="$CRAFT_PRIME/etc/cups/ssl"
-      mkdir -p "$CUPS_SERVERROOT"
-      chown 584792:584792 "$CUPS_SERVERROOT"
-      chmod 770 "$CUPS_SERVERROOT"
-
-      # Set up the state directory and file for the printer app
-      STATE_DIR="$CRAFT_PRIME/var/lib/ps-printer-app"
-      mkdir -p "$STATE_DIR"
-      chown 584792:584792 "$STATE_DIR"
-      chmod 770 "$STATE_DIR"
-
-      STATE_FILE="$STATE_DIR/ps-printer-app.state"
-      touch "$STATE_FILE"
-      chown 584792:584792 "$STATE_FILE"
-      chmod 644 "$STATE_FILE"
-
-      # Ensure the spool directory is owned properly
-      SPOOL_DIR="$CRAFT_PRIME/var/spool/ps-printer-app"
-      mkdir -p "$SPOOL_DIR"
-      chown 584792:584792 "$SPOOL_DIR"
-      chmod 770 "$SPOOL_DIR"
-
-      touch $CRAFT_PRIME/ps-printer-app.log
-      chown 584792:584792 $CRAFT_PRIME/ps-printer-app.log
-      chmod 644 $CRAFT_PRIME/ps-printer-app.log
-
   avahi:
     plugin: autotools
     source: https://github.com/avahi/avahi.git
@@ -829,6 +784,60 @@ parts:
       - -usr/share/man
       - -usr/share/locale
     after: [pappl-retrofit, pappl, libcupsfilters, libppd, cups-filters, foomatic-db, hplip]
+
+  utils:
+    plugin: nil
+    overlay-packages:
+      - python3
+      - dbus
+      - libnss-mdns
+    override-prime: |
+      set -eux
+      craftctl default
+
+      # Set up Avahi Daemon runtime directory
+      mkdir -p "$CRAFT_PRIME/var/run/avahi-daemon"
+      chown 584792:584792 "$CRAFT_PRIME/var/run/avahi-daemon"
+      chmod 777 "$CRAFT_PRIME/var/run/avahi-daemon"
+
+      # Set up D-Bus runtime directory
+      mkdir -p "$CRAFT_PRIME/var/run/dbus"
+      chown 584792:584792 "$CRAFT_PRIME/var/run/dbus"
+      chmod 777 "$CRAFT_PRIME/var/run/dbus"
+
+      # Set up the CUPS SSL server root directory
+      CUPS_SERVERROOT="$CRAFT_PRIME/etc/cups/ssl"
+      mkdir -p "$CUPS_SERVERROOT"
+      chown 584792:584792 "$CUPS_SERVERROOT"
+      chmod 770 "$CUPS_SERVERROOT"
+
+      # Set up the state directory and file for the printer app
+      STATE_DIR="$CRAFT_PRIME/var/lib/ps-printer-app"
+      mkdir -p "$STATE_DIR"
+      chown 584792:584792 "$STATE_DIR"
+      chmod 770 "$STATE_DIR"
+
+      # Create a state file inside the state directory
+      STATE_FILE="$STATE_DIR/ps-printer-app.state"
+      touch "$STATE_FILE"
+      chown 584792:584792 "$STATE_FILE"
+      chmod 644 "$STATE_FILE"
+
+      # Ensure the spool directory is owned properly
+      SPOOL_DIR="$CRAFT_PRIME/var/spool/ps-printer-app"
+      mkdir -p "$SPOOL_DIR"
+      chown 584792:584792 "$SPOOL_DIR"
+      chmod 770 "$SPOOL_DIR"
+
+      # Create and set permissions for the application log file
+      touch $CRAFT_PRIME/ps-printer-app.log
+      chown 584792:584792 $CRAFT_PRIME/ps-printer-app.log
+      chmod 644 $CRAFT_PRIME/ps-printer-app.log
+
+      # Setting up permissions to USB backend
+      USB_BACKEND="$CRAFT_PRIME/usr/lib/ps-printer-app/backend/usb"
+      chmod u+s "$USB_BACKEND"
+    after: [ps-printer-app, avahi, pappl-retrofit, pappl, libcupsfilters, libppd, cups-filters, foomatic-db, hplip]
 
   scripts:
     plugin: dump
