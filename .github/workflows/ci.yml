@@ -5,10 +5,12 @@ on:
     branches:
       - main
       - master
+      - rudransh404
   pull_request:
     branches:
       - main
       - master
+      - rudransh404
   workflow_dispatch:
 
 jobs:
